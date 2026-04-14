@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Test | QuickUtils</title>
+    <meta name="keywords" content="QuickUtils, speed, test, code, design, productivity, online tools">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://quickutils.top/speed-test/">
+    <meta property="og:title" content="Speed Test | QuickUtils">
+    <meta property="og:description" content="Test your internet download speed, upload estimation, and latency ping — all in your browser.">
+    <meta property="og:url" content="https://quickutils.top/speed-test/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="description" content="Test your internet download speed, upload estimation, and latency ping — all in your browser.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📶</text></svg>">
+    <link rel="stylesheet" href="quickutils-core.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="grid-bg">
+    <nav class="navbar glass-nav"><div class="container nav-inner">
+        <a href="https://quickutils.top" class="brand holo-text">📶 Speed Test</a>
+        <div class="nav-links">
+            <a href="https://ko-fi.com/dayatin" target="_blank" class="kofi-link">☕ Support</a>
+            <button id="themeBtn" class="theme-btn">🌙</button>
+        </div>
+    </div></nav>
+    <main class="container py-4">
+        <div class="hero-section text-center mb-4"><h1 class="gradient-text">Internet Speed Test</h1><p class="text-muted">Measure download speed, latency, and connection quality</p></div>
+    <div class="glass-card p-4 text-center">
+        <div id="speedDisplay" style="font-size:5rem;font-weight:800;color:var(--clr-primary,#6366f1);">—</div>
+        <div class="text-muted mb-3">Mbps</div>
+        <button class="btn btn-primary" id="startTest" style="font-size:1.2rem;padding:12px 40px;">▶ Start Test</button>
+        <div class="d-flex justify-content-center gap-4 mt-4" style="flex-wrap:wrap;">
+            <div class="text-center"><div class="text-muted text-sm">Latency</div><div style="font-size:1.5rem;font-weight:700;" id="latency">—</div></div>
+            <div class="text-center"><div class="text-muted text-sm">Jitter</div><div style="font-size:1.5rem;font-weight:700;" id="jitter">—</div></div>
+            <div class="text-center"><div class="text-muted text-sm">Status</div><div style="font-size:1.5rem;font-weight:700;" id="connStatus">Ready</div></div>
+        </div>
+        <div style="margin-top:2rem;background:rgba(255,255,255,0.05);border-radius:8px;height:10px;overflow:hidden;"><div id="progressBar" style="height:100%;width:0;background:linear-gradient(90deg,#6366f1,#8b5cf6);transition:width 0.3s;"></div></div>
+    </div>
+    </main>
+    <footer class="footer"><div class="container copyright text-center py-4">© 2026 QuickUtils. All rights reserved.</div></footer>
+    <script src="quickutils-core.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
