@@ -4,9 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Speed Test | QuickUtils</title>
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Speed Test",
+    "url": "https://speed.quickutils.top/",
+    "description": "Test your internet download speed, upload estimation, and latency ping \u2014 all in your browser.",
+    "applicationCategory": "BrowserApplication",
+    "operatingSystem": "All",
+    "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+    }
+}
+</script>
+    <link rel="canonical" href="https://speed.quickutils.top/">
     <meta name="keywords" content="QuickUtils, speed, test, code, design, productivity, online tools">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://quickutils.top/speed-test/">
+    
     <meta property="og:title" content="Speed Test | QuickUtils">
     <meta property="og:description" content="Test your internet download speed, upload estimation, and latency ping — all in your browser.">
     <meta property="og:url" content="https://quickutils.top/speed-test/">
@@ -29,15 +46,50 @@
     <main class="container py-4">
         <div class="hero-section text-center mb-4"><h1 class="gradient-text">Internet Speed Test</h1><p class="text-muted">Measure download speed, latency, and connection quality</p></div>
     <div class="glass-card p-4 text-center">
-        <div id="speedDisplay" style="font-size:5rem;font-weight:800;color:var(--clr-primary,#6366f1);">—</div>
-        <div class="text-muted mb-3">Mbps</div>
-        <button class="btn btn-primary" id="startTest" style="font-size:1.2rem;padding:12px 40px;">▶ Start Test</button>
-        <div class="d-flex justify-content-center gap-4 mt-4" style="flex-wrap:wrap;">
-            <div class="text-center"><div class="text-muted text-sm">Latency</div><div style="font-size:1.5rem;font-weight:700;" id="latency">—</div></div>
-            <div class="text-center"><div class="text-muted text-sm">Jitter</div><div style="font-size:1.5rem;font-weight:700;" id="jitter">—</div></div>
-            <div class="text-center"><div class="text-muted text-sm">Status</div><div style="font-size:1.5rem;font-weight:700;" id="connStatus">Ready</div></div>
+        <!-- Main Circular Dial (Simulated) -->
+        <div style="position:relative; width:250px; height:250px; margin: 0 auto 2rem; border-radius:50%; border:8px solid rgba(255,255,255,0.05); display:flex; flex-direction:column; align-items:center; justify-content:center; background: radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%);">
+            <svg id="speedGauge" width="250" height="250" style="position:absolute; top:-8px; left:-8px; transform:rotate(-90deg);">
+                <circle cx="125" cy="125" r="121" fill="none" stroke="url(#gaugeGradient)" stroke-width="8" stroke-dasharray="760" stroke-dashoffset="760" style="transition: stroke-dashoffset 0.2s ease-out; stroke-linecap:round;"></circle>
+                <defs><linearGradient id="gaugeGradient"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs>
+            </svg>
+            <div id="speedDisplay" style="font-size:3.5rem;font-weight:800;color:var(--clr-primary,#6366f1);line-height:1;">—</div>
+            <div id="speedUnit" class="text-muted" style="font-size:1.1rem; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-top:5px;">Mbps</div>
         </div>
-        <div style="margin-top:2rem;background:rgba(255,255,255,0.05);border-radius:8px;height:10px;overflow:hidden;"><div id="progressBar" style="height:100%;width:0;background:linear-gradient(90deg,#6366f1,#8b5cf6);transition:width 0.3s;"></div></div>
+
+        <button class="btn btn-primary" id="startTest" style="font-size:1.2rem;padding:12px 40px; margin-bottom: 2rem; border-radius: 30px; box-shadow: 0 4px 15px rgba(99,102,241,0.4);">▶ Start Advanced Test</button>
+        
+        <div class="d-flex justify-content-center gap-4 mt-2" style="flex-wrap:wrap;">
+            <!-- Server Info -->
+            <div class="text-center" style="flex: 1 1 100%; margin-bottom:1rem;">
+                <div class="text-muted text-sm" style="text-transform:uppercase; tracking:1px;">Closest Test Node</div>
+                <div style="font-size:1.2rem;font-weight:600;color:#e2e8f0;" id="serverNode">Detecting...</div>
+            </div>
+            
+            <div class="text-center bg-dark" style="padding:15px 25px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); min-width: 140px;">
+                <div class="text-muted text-sm mb-1">DOWNLOAD</div>
+                <div style="font-size:1.8rem;font-weight:700;color:#fff;" id="dlSpeed">—</div>
+            </div>
+            <div class="text-center bg-dark" style="padding:15px 25px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); min-width: 140px;">
+                <div class="text-muted text-sm mb-1">UPLOAD</div>
+                <div style="font-size:1.8rem;font-weight:700;color:#fff;" id="ulSpeed">—</div>
+            </div>
+            <div class="text-center" style="padding:15px; min-width:80px;">
+                <div class="text-muted text-sm">PING</div>
+                <div style="font-size:1.4rem;font-weight:700;" id="latency">—</div>
+            </div>
+            <div class="text-center" style="padding:15px; min-width:80px;">
+                <div class="text-muted text-sm">JITTER</div>
+                <div style="font-size:1.4rem;font-weight:700;" id="jitter">—</div>
+            </div>
+            <div class="text-center" style="padding:15px; min-width:80px;">
+                <div class="text-muted text-sm">RATING</div>
+                <div style="font-size:1.4rem;font-weight:700;" id="connStatus">Ready</div>
+            </div>
+        </div>
+        
+        <div style="margin-top:2rem;background:rgba(255,255,255,0.05);border-radius:8px;height:6px;overflow:hidden; position:relative;">
+            <div id="progressBar" style="height:100%;width:0;background:linear-gradient(90deg,#6366f1,#8b5cf6);transition:width 0.3s;box-shadow:0 0 10px #6366f1;"></div>
+        </div>
     </div>
     </main>
     <footer class="footer"><div class="container copyright text-center py-4">© 2026 QuickUtils. All rights reserved.</div></footer>
