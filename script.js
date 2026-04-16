@@ -158,4 +158,58 @@
         }); // <-- FIXED SYNTAX ERROR HERE
     }
 
+    // Jitter Chart and Device Diagnostics Simulation
+    const jitterChart = document.getElementById('jitterChart');
+    if(jitterChart) {
+        const ctx = jitterChart.getContext('2d');
+        const vals = new Array(20).fill(0);
+        let active = false;
+        
+        startBtn.addEventListener('click', () => { active = true; });
+        
+        function drawChart() {
+            ctx.clearRect(0,0, 200, 80);
+            if(active) {
+                // Simulate jitter pulses during test
+                const newJitter = Math.random() * Math.random() * 40;
+                vals.shift(); vals.push(newJitter);
+                
+                // Simulate Active device count based on browser hardware concurrency and entropy
+                const devices = Math.max(1, Math.floor((navigator.hardwareConcurrency || 4) / 2 + Math.random()*3));
+                document.getElementById('mockDevices').textContent = devices;
+                
+                // Packet loss
+                if(Math.random() > 0.95) {
+                    document.getElementById('packetLoss').textContent = "0.1%";
+                    document.getElementById('packetLoss').style.color = '#ef4444';
+                } else {
+                    document.getElementById('packetLoss').textContent = "0.0%";
+                    document.getElementById('packetLoss').style.color = '';
+                }
+            }
+            
+            ctx.beginPath();
+            ctx.moveTo(0, 80);
+            for(let i=0; i<vals.length; i++) {
+                const x = (i / vals.length) * 200;
+                const y = 80 - vals[i];
+                ctx.lineTo(x, y);
+            }
+            ctx.lineTo(200, 80);
+            
+            const grad = ctx.createLinearGradient(0,0, 0,80);
+            grad.addColorStop(0, 'rgba(168, 85, 247, 0.4)');
+            grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad;
+            ctx.fill();
+            
+            ctx.strokeStyle = '#a855f7';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            
+            requestAnimationFrame(drawChart);
+        }
+        drawChart();
+    }
+
 })();

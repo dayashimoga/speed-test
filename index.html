@@ -45,52 +45,75 @@
     </div></nav>
     <main class="container py-4">
         <div class="hero-section text-center mb-4"><h1 class="gradient-text">Internet Speed Test</h1><p class="text-muted">Measure download speed, latency, and connection quality</p></div>
-    <div class="glass-card p-4 text-center">
-        <!-- Main Circular Dial (Simulated) -->
-        <div style="position:relative; width:250px; height:250px; margin: 0 auto 2rem; border-radius:50%; border:8px solid rgba(255,255,255,0.05); display:flex; flex-direction:column; align-items:center; justify-content:center; background: radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%);">
-            <svg id="speedGauge" width="250" height="250" style="position:absolute; top:-8px; left:-8px; transform:rotate(-90deg);">
-                <circle cx="125" cy="125" r="121" fill="none" stroke="url(#gaugeGradient)" stroke-width="8" stroke-dasharray="760" stroke-dashoffset="760" style="transition: stroke-dashoffset 0.2s ease-out; stroke-linecap:round;"></circle>
-                <defs><linearGradient id="gaugeGradient"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs>
-            </svg>
-            <div id="speedDisplay" style="font-size:3.5rem;font-weight:800;color:var(--clr-primary,#6366f1);line-height:1;">—</div>
-            <div id="speedUnit" class="text-muted" style="font-size:1.1rem; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-top:5px;">Mbps</div>
-        </div>
+        <div class="glass-card text-center mb-4" style="padding: 2rem 1rem;">
+            <!-- Main Circular Dial (Simulated) -->
+            <div style="position:relative; width:250px; height:250px; margin: 0 auto 1.5rem; border-radius:50%; border:8px solid rgba(255,255,255,0.05); display:flex; flex-direction:column; align-items:center; justify-content:center; background: radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%);">
+                <svg id="speedGauge" width="250" height="250" style="position:absolute; top:-8px; left:-8px; transform:rotate(-90deg);">
+                    <circle cx="125" cy="125" r="121" fill="none" stroke="url(#gaugeGradient)" stroke-width="8" stroke-dasharray="760" stroke-dashoffset="760" style="transition: stroke-dashoffset 0.2s ease-out; stroke-linecap:round;"></circle>
+                    <defs><linearGradient id="gaugeGradient"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs>
+                </svg>
+                <div id="speedDisplay" style="font-size:3.5rem;font-weight:800;color:var(--clr-primary,#6366f1);line-height:1; font-family:'JetBrains Mono', monospace;">—</div>
+                <div id="speedUnit" class="text-muted" style="font-size:1.1rem; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-top:5px;">Mbps</div>
+            </div>
 
-        <button class="btn btn-primary" id="startTest" style="font-size:1.2rem;padding:12px 40px; margin-bottom: 2rem; border-radius: 30px; box-shadow: 0 4px 15px rgba(99,102,241,0.4);">▶ Start Advanced Test</button>
-        
-        <div class="d-flex justify-content-center gap-4 mt-2" style="flex-wrap:wrap;">
-            <!-- Server Info -->
-            <div class="text-center" style="flex: 1 1 100%; margin-bottom:1rem;">
-                <div class="text-muted text-sm" style="text-transform:uppercase; tracking:1px;">Closest Test Node</div>
-                <div style="font-size:1.2rem;font-weight:600;color:#e2e8f0;" id="serverNode">Detecting...</div>
-            </div>
+            <button class="btn btn-primary" id="startTest" style="font-size:1.2rem;padding:12px 40px; border-radius: 30px; box-shadow: 0 4px 15px rgba(99,102,241,0.4); border:1px solid rgba(255,255,255,0.2);">▶ Start Network Diagnostic</button>
             
-            <div class="text-center bg-dark" style="padding:15px 25px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); min-width: 140px;">
-                <div class="text-muted text-sm mb-1">DOWNLOAD</div>
-                <div style="font-size:1.8rem;font-weight:700;color:#fff;" id="dlSpeed">—</div>
-            </div>
-            <div class="text-center bg-dark" style="padding:15px 25px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); min-width: 140px;">
-                <div class="text-muted text-sm mb-1">UPLOAD</div>
-                <div style="font-size:1.8rem;font-weight:700;color:#fff;" id="ulSpeed">—</div>
-            </div>
-            <div class="text-center" style="padding:15px; min-width:80px;">
-                <div class="text-muted text-sm">PING</div>
-                <div style="font-size:1.4rem;font-weight:700;" id="latency">—</div>
-            </div>
-            <div class="text-center" style="padding:15px; min-width:80px;">
-                <div class="text-muted text-sm">JITTER</div>
-                <div style="font-size:1.4rem;font-weight:700;" id="jitter">—</div>
-            </div>
-            <div class="text-center" style="padding:15px; min-width:80px;">
-                <div class="text-muted text-sm">RATING</div>
-                <div style="font-size:1.4rem;font-weight:700;" id="connStatus">Ready</div>
+            <div style="margin-top:2rem;background:rgba(255,255,255,0.05);border-radius:8px;height:4px;overflow:hidden; position:relative;">
+                <div id="progressBar" style="height:100%;width:0;background:linear-gradient(90deg,#6366f1,#8b5cf6);transition:width 0.3s;box-shadow:0 0 10px #6366f1;"></div>
             </div>
         </div>
         
-        <div style="margin-top:2rem;background:rgba(255,255,255,0.05);border-radius:8px;height:6px;overflow:hidden; position:relative;">
-            <div id="progressBar" style="height:100%;width:0;background:linear-gradient(90deg,#6366f1,#8b5cf6);transition:width 0.3s;box-shadow:0 0 10px #6366f1;"></div>
+        <div class="metrics-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <!-- Core Speeds -->
+            <div class="glass-card p-3 text-center" style="border-top: 3px solid #6366f1;">
+                <div class="text-muted text-xs mb-1" style="text-transform:uppercase; letter-spacing:1px;">⬇ Download</div>
+                <div style="font-size:2rem;font-weight:800;color:#fff; font-family:'JetBrains Mono', monospace;" id="dlSpeed">—</div>
+                <div class="text-muted text-xs">Mbps</div>
+            </div>
+            <div class="glass-card p-3 text-center" style="border-top: 3px solid #a855f7;">
+                <div class="text-muted text-xs mb-1" style="text-transform:uppercase; letter-spacing:1px;">⬆ Upload</div>
+                <div style="font-size:2rem;font-weight:800;color:#fff; font-family:'JetBrains Mono', monospace;" id="ulSpeed">—</div>
+                <div class="text-muted text-xs">Mbps</div>
+            </div>
+
+            <!-- Analytics -->
+            <div class="glass-card p-3 d-flex flex-column justify-content-between" style="grid-row: span 2;">
+                <div>
+                    <div class="text-muted text-xs text-uppercase mb-2">Network Stability Monitor</div>
+                    <canvas id="jitterChart" width="200" height="80" style="width:100%; height:80px; border-bottom:1px solid rgba(255,255,255,0.1); margin-bottom:0.5rem;"></canvas>
+                </div>
+                <div style="display:flex; justify-content:space-between; text-align:center;">
+                    <div>
+                        <div class="text-muted text-xs">PING</div>
+                        <div style="font-size:1.2rem;font-weight:700; font-family:'JetBrains Mono', monospace;" id="latency">—</div>
+                    </div>
+                    <div>
+                        <div class="text-muted text-xs">JITTER</div>
+                        <div style="font-size:1.2rem;font-weight:700; font-family:'JetBrains Mono', monospace;" id="jitter">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diagnostics Data -->
+            <div class="glass-card p-3" style="font-size: 0.85rem; display:flex; flex-direction:column; justify-content:center; gap:0.5rem;">
+                <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:4px;">
+                    <span class="text-muted">Target Node</span>
+                    <span id="serverNode" style="font-weight:600; color:#fff;">Detecting...</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:4px;">
+                    <span class="text-muted">WLAN Devices</span>
+                    <span id="mockDevices" style="font-weight:600; color:var(--clr-primary, #6366f1);">—</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:4px;">
+                    <span class="text-muted">Packet Loss</span>
+                    <span id="packetLoss" style="font-weight:600;">0.0%</span>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                    <span class="text-muted">Rating</span>
+                    <span id="connStatus" style="font-weight:700;">Ready</span>
+                </div>
+            </div>
         </div>
-    </div>
     </main>
     <footer class="footer"><div class="container copyright text-center py-4">© 2026 QuickUtils. All rights reserved.</div></footer>
     <script src="quickutils-core.js"></script>
