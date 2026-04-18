@@ -3,278 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Speed Test | QuickUtils</title>
+    <title>Speed Test Platinum | QuickUtils</title>
     <script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "Speed Test",
-    "url": "https://speed.quickutils.top/",
-    "description": "Test your internet download speed, upload estimation, and latency ping \u2014 all in your browser.",
-    "applicationCategory": "BrowserApplication",
-    "operatingSystem": "All",
-    "offers": {
-        "@type": "Offer",
-        "price": "0.00",
-        "priceCurrency": "USD"
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Speed Test Platinum",
+        "url": "https://speed.quickutils.top/",
+        "description": "Enterprise grade multi-threaded speed test and diagnostic platform.",
+        "applicationCategory": "BrowserApplication",
+        "operatingSystem": "All",
+        "offers": {
+            "@type": "Offer",
+            "price": "0.00",
+            "priceCurrency": "USD"
+        }
     }
-}
-</script>
+    </script>
     <link rel="canonical" href="https://speed.quickutils.top/">
-    <meta name="keywords" content="QuickUtils, speed, test, code, design, productivity, online tools">
-    <meta name="robots" content="index, follow">
-    
-    <meta property="og:title" content="Speed Test | QuickUtils">
-    <meta property="og:description" content="Test your internet download speed, upload estimation, and latency ping — all in your browser.">
-    <meta property="og:url" content="https://quickutils.top/speed-test/">
-    <meta property="og:type" content="website">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="description" content="Test your internet download speed, upload estimation, and latency ping — all in your browser.">
+    <meta name="description" content="Multi-threaded enterprise grade speed test with real-time waveform analytics.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📶</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="quickutils-core.css">
     <link rel="stylesheet" href="style.css">
-    <meta name="theme-color" content="#ffffff">
 </head>
 <body class="grid-bg">
+    <canvas id="vfxCanvas"></canvas>
+    
     <nav class="navbar glass-nav"><div class="container nav-inner">
-        <a href="https://quickutils.top" class="brand holo-text">📶 Speed Test</a>
+        <a href="https://quickutils.top" class="brand holo-text">📶 Speed Test Platinum</a>
         <div class="nav-links">
             <a href="https://ko-fi.com/dayatin" target="_blank" class="kofi-link">☕ Support</a>
             <button id="themeBtn" class="theme-btn">🌙</button>
         </div>
     </div></nav>
-    <main class="container py-4">
-        <div class="hero-section text-center mb-4"><h1 class="gradient-text">Internet Speed Test</h1><p class="text-muted">Measure download speed, latency, and connection quality</p></div>
-        <div class="glass-card text-center mb-4" style="padding: 2rem 1rem;">
-            <!-- Main Circular Dial (Simulated) -->
-            <div style="position:relative; width:250px; height:250px; margin: 0 auto 1.5rem; border-radius:50%; border:8px solid rgba(255,255,255,0.05); display:flex; flex-direction:column; align-items:center; justify-content:center; background: radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%);">
-                <svg id="speedGauge" width="250" height="250" style="position:absolute; top:-8px; left:-8px; transform:rotate(-90deg);">
-                    <circle cx="125" cy="125" r="121" fill="none" stroke="url(#gaugeGradient)" stroke-width="8" stroke-dasharray="760" stroke-dashoffset="760" style="transition: stroke-dashoffset 0.2s ease-out; stroke-linecap:round;"></circle>
-                    <defs><linearGradient id="gaugeGradient"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs>
+
+    <main class="container py-4" style="position:relative; z-index: 10;">
+        <div class="glass-card text-center mb-4 hero-card">
+            <div class="dial-container">
+                <svg id="speedGauge" width="300" height="300" class="gauge-svg">
+                    <circle cx="150" cy="150" r="140" class="gauge-bg"></circle>
+                    <circle cx="150" cy="150" r="140" class="gauge-fill" id="gaugeFill"></circle>
+                    <defs>
+                        <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#3b82f6"/>
+                            <stop offset="50%" stop-color="#8b5cf6"/>
+                            <stop offset="100%" stop-color="#ec4899"/>
+                        </linearGradient>
+                    </defs>
                 </svg>
-                <div id="speedDisplay" style="font-size:3.5rem;font-weight:800;color:var(--clr-primary,#6366f1);line-height:1; font-family:'JetBrains Mono', monospace;">—</div>
-                <div id="speedUnit" class="text-muted" style="font-size:1.1rem; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-top:5px;">Mbps</div>
+                <div class="dial-content">
+                    <div id="speedDisplay" class="speed-value">0.0</div>
+                    <div id="speedUnit" class="speed-unit">Mbps</div>
+                    <div id="phaseDisplay" class="phase-label">READY</div>
+                </div>
             </div>
-
-            <button class="btn btn-primary" id="startTest" style="font-size:1.2rem;padding:12px 40px; border-radius: 30px; box-shadow: 0 4px 15px rgba(99,102,241,0.4); border:1px solid rgba(255,255,255,0.2);">▶ Start Network Diagnostic</button>
+            <button class="btn btn-primary btn-glow" id="startTest">▶ INITIALIZE DIAGNOSTIC</button>
             
-            <div style="margin-top:2rem;background:rgba(255,255,255,0.05);border-radius:8px;height:4px;overflow:hidden; position:relative;">
-                <div id="progressBar" style="height:100%;width:0;background:linear-gradient(90deg,#6366f1,#8b5cf6);transition:width 0.3s;box-shadow:0 0 10px #6366f1;"></div>
-            </div>
-        </div>
-        
-        <div class="metrics-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-            <!-- Core Speeds -->
-            <div class="glass-card p-3 text-center" style="border-top: 3px solid #6366f1;">
-                <div class="text-muted text-xs mb-1" style="text-transform:uppercase; letter-spacing:1px;">⬇ Download</div>
-                <div style="font-size:2rem;font-weight:800;color:#fff; font-family:'JetBrains Mono', monospace;" id="dlSpeed">—</div>
-                <div class="text-muted text-xs">Mbps</div>
-            </div>
-            <div class="glass-card p-3 text-center" style="border-top: 3px solid #a855f7;">
-                <div class="text-muted text-xs mb-1" style="text-transform:uppercase; letter-spacing:1px;">⬆ Upload</div>
-                <div style="font-size:2rem;font-weight:800;color:#fff; font-family:'JetBrains Mono', monospace;" id="ulSpeed">—</div>
-                <div class="text-muted text-xs">Mbps</div>
-            </div>
-
-            <!-- Analytics -->
-            <div class="glass-card p-3 d-flex flex-column justify-content-between" style="grid-row: span 2;">
-                <div>
-                    <div class="text-muted text-xs text-uppercase mb-2">Network Stability Monitor</div>
-                    <canvas id="jitterChart" width="200" height="80" style="width:100%; height:80px; border-bottom:1px solid rgba(255,255,255,0.1); margin-bottom:0.5rem;"></canvas>
-                </div>
-                <div style="display:flex; justify-content:space-between; text-align:center;">
-                    <div>
-                        <div class="text-muted text-xs">PING</div>
-                        <div style="font-size:1.2rem;font-weight:700; font-family:'JetBrains Mono', monospace;" id="latency">—</div>
-                    </div>
-                    <div>
-                        <div class="text-muted text-xs">JITTER</div>
-                        <div style="font-size:1.2rem;font-weight:700; font-family:'JetBrains Mono', monospace;" id="jitter">—</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Diagnostics Data -->
-            <div class="glass-card p-3" style="font-size: 0.85rem; display:flex; flex-direction:column; justify-content:center; gap:0.5rem;">
-                <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:4px;">
-                    <span class="text-muted">Target Node</span>
-                    <span id="serverNode" style="font-weight:600; color:#fff;">Detecting...</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:4px;">
-                    <span class="text-muted">WLAN Devices</span>
-                    <span id="mockDevices" style="font-weight:600; color:var(--clr-primary, #6366f1);">—</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:4px;">
-                    <span class="text-muted">Packet Loss</span>
-                    <span id="packetLoss" style="font-weight:600;">0.0%</span>
-                </div>
-                <div style="display:flex; justify-content:space-between;">
-                    <span class="text-muted">Rating</span>
-                    <span id="connStatus" style="font-weight:700;">Ready</span>
-                </div>
+            <div class="progress-container">
+                <div id="progressBar" class="progress-bar"></div>
             </div>
         </div>
 
-        <!-- Professional Features Panels -->
-        <div class="metrics-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
-            
-            <!-- History Log -->
-            <div class="glass-card p-3">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem;">
-                    <div class="text-muted text-xs text-uppercase" style="letter-spacing:1px;">Test History</div>
-                    <button class="btn btn-secondary" id="clearHistoryBtn" style="padding: 2px 8px; font-size: 0.7rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #aaa;">Clear</button>
+        <div class="metrics-grid">
+            <div class="metric-card border-blue">
+                <div class="metric-label">⬇ DOWNLOAD</div>
+                <div class="metric-value"><span id="dlSpeed">—</span> <small>Mbps</small></div>
+            </div>
+            <div class="metric-card border-purple">
+                <div class="metric-label">⬆ UPLOAD</div>
+                <div class="metric-value"><span id="ulSpeed">—</span> <small>Mbps</small></div>
+            </div>
+            <div class="metric-card border-pink">
+                <div class="metric-label">⏱ PING</div>
+                <div class="metric-value"><span id="latency">—</span> <small>ms</small></div>
+            </div>
+            <div class="metric-card border-orange">
+                <div class="metric-label">〰 JITTER</div>
+                <div class="metric-value"><span id="jitter">—</span> <small>ms</small></div>
+            </div>
+        </div>
+
+        <div class="panels-grid">
+            <div class="glass-card panel">
+                <div class="panel-header">
+                    <span>Network Insights</span>
                 </div>
-                <div id="historyLogList" style="max-height: 150px; overflow-y: auto; font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.4rem; padding-right: 4px;">
-                    <div class="text-muted text-center" style="padding: 1rem;" id="historyEmpty">No history yet.</div>
+                <div id="networkInsights" class="insights-content text-muted">
+                    Test your network to reveal streaming and gaming capabilities.
+                </div>
+                <button class="btn btn-secondary mt-3 w-100" id="shareBtn" disabled>📋 Copy Certification</button>
+            </div>
+
+            <div class="glass-card panel">
+                <div class="panel-header">
+                    <span>Server & Client Data</span>
+                </div>
+                <div class="data-list">
+                    <div class="data-row"><span>Target Node:</span><span id="serverNode" class="text-highlight">Routing...</span></div>
+                    <div class="data-row"><span>Test Status:</span><span id="connStatus" class="status-badge">Standby</span></div>
+                    <div class="data-row"><span>Test Mode:</span><span>Multi-Threaded</span></div>
                 </div>
             </div>
 
-            <!-- Comparison & Recommendations -->
-            <div class="glass-card p-3">
-                <div class="text-muted text-xs text-uppercase mb-2" style="letter-spacing:1px;">Network Insights</div>
-                <div id="networkRecommendations" style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 1rem; line-height: 1.4; min-height: 40px;">
-                    Run a test to see what your connection can handle.
+            <div class="glass-card panel">
+                <div class="panel-header">
+                    <span>Historical Analytics</span>
+                    <button id="clearHistoryBtn" class="btn-clear" aria-label="Clear history">Clear</button>
                 </div>
-                
-                <div class="text-muted text-xs text-uppercase mb-2" style="letter-spacing:1px;">Global Comparison</div>
-                <div style="font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.5rem;">
-                    <div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom: 4px;"><span>Global Avg (DL)</span><span>50 Mbps</span></div>
-                        <div style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;"><div style="width: 25%; height:100%; background:#64748b; border-radius:3px;"></div></div>
-                    </div>
-                    <div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom: 4px;"><span>Your Speed</span><span id="compYourSpeed">—</span></div>
-                        <div style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;"><div id="compYourBar" style="width: 0%; height:100%; background:linear-gradient(90deg, #6366f1, #8b5cf6); border-radius:3px; transition: width 1s ease-out;"></div></div>
-                    </div>
-                </div>
+                <div id="historyLogList" class="history-list"></div>
             </div>
-
-            <!-- Share Results -->
-            <div class="glass-card p-3 text-center" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
-                <div class="text-muted text-xs text-uppercase mb-2" style="letter-spacing:1px;">Quality Score</div>
-                <div style="font-size: 3rem; font-weight: 800; line-height: 1; margin-bottom: 0.25rem; font-family:'JetBrains Mono', monospace;" id="shareScoreDisplay">—</div>
-                <div style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #a855f7; margin-bottom: 1rem;" id="shareScoreLabel">Score</div>
-                <button class="btn" id="shareBtn" disabled style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 8px 20px; border-radius: 20px; cursor: pointer; transition: all 0.2s;">📋 Copy Text</button>
-            </div>
-            
         </div>
     </main>
-    <footer class="footer"><div class="container copyright text-center py-4">© 2026 QuickUtils. All rights reserved.</div></footer>
+
+    <footer class="footer"><div class="container text-center py-4 text-muted">© 2026 QuickUtils. Multi-threaded Architecture.</div></footer>
     <script src="quickutils-core.js"></script>
     <script src="script.js"></script>
-
-
-
-
-
-<!-- QuickUtils Network Promo -->
-<div id="qu-promo-ribbon" style="position:relative; z-index:50; margin-top:2rem; padding:0; background:#111; border-top:1px solid rgba(128,128,128,0.3); text-align:center; font-family:sans-serif;">
-   <button onclick="var c=document.getElementById('qu-promo-content');c.style.display=c.style.display==='none'?'block':'none';this.textContent=c.style.display==='none'?'🚀 Explore 90+ QuickUtils Apps ▼':'▲ Close'" style="width:100%;padding:10px;background:transparent;border:none;color:#aaa;cursor:pointer;font-size:0.85rem;font-family:inherit;">🚀 Explore 90+ QuickUtils Apps ▼</button>
-   <div id="qu-promo-content" style="display:none; padding:1rem 1rem 2rem 1rem;">
-   <div style="display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:center; max-width:1200px; margin:0 auto;">
-      <a href="https://roomplanner.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">3D Room Planner</a>
-      <a href="https://apistatus.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">API Status Directory</a>
-      <a href="https://ascii.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">ASCII Art Studio</a>
-      <a href="https://algorithms.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Algorithm Visualizer</a>
-      <a href="https://ambient.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Ambient Sound Mixer</a>
-      <a href="https://beatmaker.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Beat Maker</a>
-      <a href="https://blackhole.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Blackhole Raytracer</a>
-      <a href="https://boilerplates.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Boilerplates Directory</a>
-      <a href="https://quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Boring Website</a>
-      <a href="https://budget.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Budget Tracker</a>
-      <a href="https://cssbattle.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">CSS Battle</a>
-      <a href="https://gradients.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">CSS Gradient Studio</a>
-      <a href="https://charts.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Chart Maker</a>
-      <a href="https://cheatsheets.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Cheatsheets Directory</a>
-      <a href="https://chemistry.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Chemistry Lab</a>
-      <a href="https://circuits.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Circuit Designer</a>
-      <a href="https://cityflow.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">City Pathfinding</a>
-      <a href="https://code.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Code Arena</a>
-      <a href="https://diff.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Code Diff</a>
-      <a href="https://whiteboard.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Collaborative Whiteboard</a>
-      <a href="https://coloring.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Coloring Books</a>
-      <a href="https://countries.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Country Explorer</a>
-      <a href="https://cron.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Cron Builder</a>
-      <a href="https://cyberdefense.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Cyber Defense</a>
-      <a href="https://dna.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">DNA Lab</a>
-      <a href="https://convert.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Data Converter</a>
-      <a href="https://datasets.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Datasets Directory</a>
-      <a href="https://decide.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Decision Maker</a>
-      <a href="https://draw.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Drawing Board</a>
-      <a href="https://earthquake.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Earthquake Explorer</a>
-      <a href="https://escaperoom.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Escape Room</a>
-      <a href="https://firesimulator.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">FIRE Simulator</a>
-      <a href="https://flashcards.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Flashcard Maker</a>
-      <a href="https://fonts.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Font Playground</a>
-      <a href="https://genetics.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Genetic Code Studio</a>
-      <a href="https://streak.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Habit Streak</a>
-      <a href="https://habits.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Habit Tracker</a>
-      <a href="https://ip.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">IP Lookup</a>
-      <a href="https://image.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Image Converter</a>
-      <a href="https://elements.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Interactive Periodic Table</a>
-      <a href="https://invoices.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Invoice Generator</a>
-      <a href="https://json.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">JSON Explorer</a>
-      <a href="https://jobs.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Jobs Directory</a>
-      <a href="https://languageplayground.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Language Playground</a>
-      <a href="https://life.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Life Simulator</a>
-      <a href="https://loan.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Loan Calculator</a>
-      <a href="https://logicsim.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Logic Simulator</a>
-      <a href="https://markdown.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Markdown Editor</a>
-      <a href="https://market.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Market Digest</a>
-      <a href="https://grapher.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Math Grapher</a>
-      <a href="https://memes.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Meme Generator</a>
-      <a href="https://mindmap.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Mind Map</a>
-      <a href="https://mlnodes.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Ml Node Editor</a>
-      <a href="https://music.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Music Maker</a>
-      <a href="https://musicviz.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Music Visualizer</a>
-      <a href="https://nettools.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Network Tools</a>
-      <a href="https://opensource.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Open Source Directory</a>
-      <a href="https://pdfstudio.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">PDF Studio</a>
-      <a href="https://physics.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Physics Sandbox</a>
-      <a href="https://pixelart.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Pixel Art Editor</a>
-      <a href="https://focus.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Pomodoro Focus Timer</a>
-      <a href="https://prices.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Price Comparator</a>
-      <a href="https://privacymap.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Privacy Map</a>
-      <a href="https://planets.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Procedural Planet</a>
-      <a href="https://prompts.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Prompts Directory</a>
-      <a href="https://proteins.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Protein Visualizer</a>
-      <a href="https://qr.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">QR Studio</a>
-      <a href="https://quantumsandbox.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Quantum Sandbox</a>
-      <a href="https://quiz.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Quiz Master</a>
-      <a href="https://regex.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Regex Playground</a>
-      <a href="https://resume.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Resume Builder</a>
-      <a href="https://games.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Retro Games</a>
-      <a href="https://rhythm.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Rhythm Trainer</a>
-      <a href="https://svg.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">SVG Editor</a>
-      <a href="https://screenrecord.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Screen Recorder</a>
-      <a href="https://solar.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Solar System Explorer</a>
-      <a href="https://sounds.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Sound Board</a>
-      <a href="https://soundlab.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Sound Lab</a>
-      <a href="https://spacemission.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Space Mission Control</a>
-      <a href="https://speed.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Speed Test</a>
-      <a href="https://stocks.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Stock Simulator</a>
-      <a href="https://subtitlegenerator.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Subtitle Generator</a>
-      <a href="https://textbehind.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Text Behind Image</a>
-      <a href="https://text.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Text Toolkit</a>
-      <a href="https://timeline.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Timeline Universe</a>
-      <a href="https://tools.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Tools Directory</a>
-      <a href="https://travelbuilder.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Travel Builder</a>
-      <a href="https://typing.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Typing Speed Test</a>
-      <a href="https://video.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Video Studio</a>
-      <a href="https://weather.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Weather Dashboard</a>
-      <a href="https://chess.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Web Chess</a>
-      <a href="https://workoutarchitect.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">Workout Architect</a>
-      <a href="https://worldbuilder.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">World Builder</a>
-      <a href="https://clock.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">World Clock</a>
-
-   </div>
-   </div>
-</div>
-<!-- /QuickUtils Network Promo -->
-
-
-
-
-
 </body>
 </html>
