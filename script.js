@@ -346,7 +346,7 @@
         els.status.textContent = grade;
         
         // Generate Insights
-        let iHtml = \`<p><strong style="color:\${color}">Grade \${letter}: \${grade}</strong></p>\`;
+        let iHtml = `<p><strong style="color:${color}">Grade ${letter}: ${grade}</strong></p>`;
         if(finalDl >= 100) iHtml += '<p>✅ <strong>Flawless 4K Streaming.</strong> Download speeds easily support multiple ultra-HD devices simultaneously without buffering.</p>';
         else if(finalDl >= 25) iHtml += '<p>✅ <strong>Stable HD Streaming.</strong> Good enough for 1080p streaming and casual browsing.</p>';
         else iHtml += '<p>⚠️ <strong>Slow Downloads.</strong> May struggle with multiple devices or high-resolution video.</p>';
@@ -368,7 +368,7 @@
         // Sharing
         els.share.disabled = false;
         els.share.onclick = () => {
-            const txt = \`📶 Platinum Network Diagnostic\nGrade: \${letter} (\${grade})\n⬇️ DL: \${finalDl} Mbps\n⬆️ UL: \${finalUl} Mbps\n⏱️ Ping: \${finalLat}ms | Jitter: \${finalJit}ms\nTested natively on QuickUtils\`;
+            const txt = `📶 Platinum Network Diagnostic\nGrade: ${letter} (${grade})\n⬇️ DL: ${finalDl} Mbps\n⬆️ UL: ${finalUl} Mbps\n⏱️ Ping: ${finalLat}ms | Jitter: ${finalJit}ms\nTested natively on QuickUtils`;
             navigator.clipboard.writeText(txt).then(() => {
                 const og = els.share.textContent;
                 els.share.textContent = '✅ Copied to Clipboard';
