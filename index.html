@@ -114,6 +114,50 @@
                 </div>
             </div>
         </div>
+
+        <!-- Professional Features Panels -->
+        <div class="metrics-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            
+            <!-- History Log -->
+            <div class="glass-card p-3">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem;">
+                    <div class="text-muted text-xs text-uppercase" style="letter-spacing:1px;">Test History</div>
+                    <button class="btn btn-secondary" id="clearHistoryBtn" style="padding: 2px 8px; font-size: 0.7rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #aaa;">Clear</button>
+                </div>
+                <div id="historyLogList" style="max-height: 150px; overflow-y: auto; font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.4rem; padding-right: 4px;">
+                    <div class="text-muted text-center" style="padding: 1rem;" id="historyEmpty">No history yet.</div>
+                </div>
+            </div>
+
+            <!-- Comparison & Recommendations -->
+            <div class="glass-card p-3">
+                <div class="text-muted text-xs text-uppercase mb-2" style="letter-spacing:1px;">Network Insights</div>
+                <div id="networkRecommendations" style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 1rem; line-height: 1.4; min-height: 40px;">
+                    Run a test to see what your connection can handle.
+                </div>
+                
+                <div class="text-muted text-xs text-uppercase mb-2" style="letter-spacing:1px;">Global Comparison</div>
+                <div style="font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom: 4px;"><span>Global Avg (DL)</span><span>50 Mbps</span></div>
+                        <div style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;"><div style="width: 25%; height:100%; background:#64748b; border-radius:3px;"></div></div>
+                    </div>
+                    <div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom: 4px;"><span>Your Speed</span><span id="compYourSpeed">—</span></div>
+                        <div style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;"><div id="compYourBar" style="width: 0%; height:100%; background:linear-gradient(90deg, #6366f1, #8b5cf6); border-radius:3px; transition: width 1s ease-out;"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Share Results -->
+            <div class="glass-card p-3 text-center" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                <div class="text-muted text-xs text-uppercase mb-2" style="letter-spacing:1px;">Quality Score</div>
+                <div style="font-size: 3rem; font-weight: 800; line-height: 1; margin-bottom: 0.25rem; font-family:'JetBrains Mono', monospace;" id="shareScoreDisplay">—</div>
+                <div style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #a855f7; margin-bottom: 1rem;" id="shareScoreLabel">Score</div>
+                <button class="btn" id="shareBtn" disabled style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 8px 20px; border-radius: 20px; cursor: pointer; transition: all 0.2s;">📋 Copy Text</button>
+            </div>
+            
+        </div>
     </main>
     <footer class="footer"><div class="container copyright text-center py-4">© 2026 QuickUtils. All rights reserved.</div></footer>
     <script src="quickutils-core.js"></script>
@@ -121,11 +165,13 @@
 
 
 
+
+
 <!-- QuickUtils Network Promo -->
-<div id="qu-promo-ribbon" style="margin-top:4rem; padding:2rem 1rem; background:rgba(0,0,0,0.05); border-top:1px solid rgba(128,128,128,0.2); text-align:center; font-family:sans-serif;">
-   <h3 style="margin:0 0 1rem 0; font-size:1.1rem; opacity:0.8; font-weight:600;">🚀 Explore the QuickUtils App Network</h3>
-   <p style="font-size:0.9rem; opacity:0.7; max-width:600px; margin:0 auto 1.5rem auto;">Discover 90+ professional, zero-friction tools built to accelerate your workflow.</p>
-   <div style="display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:center; max-width:1200px; margin:0 auto; padding-bottom: 2rem;">
+<div id="qu-promo-ribbon" style="position:relative; z-index:50; margin-top:2rem; padding:0; background:#111; border-top:1px solid rgba(128,128,128,0.3); text-align:center; font-family:sans-serif;">
+   <button onclick="var c=document.getElementById('qu-promo-content');c.style.display=c.style.display==='none'?'block':'none';this.textContent=c.style.display==='none'?'🚀 Explore 90+ QuickUtils Apps ▼':'▲ Close'" style="width:100%;padding:10px;background:transparent;border:none;color:#aaa;cursor:pointer;font-size:0.85rem;font-family:inherit;">🚀 Explore 90+ QuickUtils Apps ▼</button>
+   <div id="qu-promo-content" style="display:none; padding:1rem 1rem 2rem 1rem;">
+   <div style="display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:center; max-width:1200px; margin:0 auto;">
       <a href="https://roomplanner.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">3D Room Planner</a>
       <a href="https://apistatus.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">API Status Directory</a>
       <a href="https://ascii.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">ASCII Art Studio</a>
@@ -222,8 +268,11 @@
       <a href="https://clock.quickutils.top" target="_blank" style="padding: 4px 10px; background: rgba(128,128,128,0.1); border-radius: 8px; font-size: 0.8rem; text-decoration: none; color: inherit; opacity: 0.8; transition: all 0.2s; white-space: nowrap;">World Clock</a>
 
    </div>
+   </div>
 </div>
 <!-- /QuickUtils Network Promo -->
+
+
 
 
 

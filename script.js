@@ -140,22 +140,148 @@
 
             // Scoring
             let quality = 'Poor'; 
+            let letterGrade = 'F';
             let pts = 0;
-            if(parseFloat(finalDl) > 25) pts++;
-            if(parseFloat(finalDl) > 100) pts++;
+            const fDl = parseFloat(finalDl);
+            const fUl = parseFloat(finalUl);
+            
+            if(fDl > 25) pts++;
+            if(fDl > 100) pts += 2;
+            if(fDl > 500) pts++;
+            if(fUl > 10) pts++;
+            if(fUl > 50) pts++;
             if(avgPing < 50) pts++;
+            if(avgPing < 20) pts++;
             if(jitter < 20) pts++;
             
-            if(pts >= 4) { quality = 'Excellent'; statusDisplay.style.color = '#22c55e'; }
-            else if(pts >= 2) { quality = 'Good'; statusDisplay.style.color = '#3b82f6'; }
-            else if(pts >= 1) { quality = 'Fair'; statusDisplay.style.color = '#f59e0b'; }
-            else { statusDisplay.style.color = '#ef4444'; }
+            if(pts >= 8) { quality = 'Excellent'; statusDisplay.style.color = '#22c55e'; letterGrade = 'A+'; }
+            else if(pts >= 6) { quality = 'Excellent'; statusDisplay.style.color = '#22c55e'; letterGrade = 'A'; }
+            else if(pts >= 4) { quality = 'Good'; statusDisplay.style.color = '#3b82f6'; letterGrade = 'B'; }
+            else if(pts >= 2) { quality = 'Fair'; statusDisplay.style.color = '#f59e0b'; letterGrade = 'C'; }
+            else { statusDisplay.style.color = '#ef4444'; letterGrade = 'D'; }
             
             statusDisplay.textContent = quality;
             startBtn.disabled = false; 
             startBtn.textContent = '▶ Restart Test';
             bar.style.opacity = '0';
-        }); // <-- FIXED SYNTAX ERROR HERE
+            
+            // --- PROFESSIONAL FEATURES ---
+            
+            // 1. Quality Score & Share
+            const scoreDisplay = $('#shareScoreDisplay');
+            const scoreLabel = $('#shareScoreLabel');
+            const shareBtn = $('#shareBtn');
+            if(scoreDisplay) {
+                scoreDisplay.textContent = letterGrade;
+                scoreDisplay.style.color = statusDisplay.style.color;
+                scoreLabel.textContent = quality + ' Connection';
+                shareBtn.disabled = false;
+                
+                const shareText = `📶 Speed Test Results\nScore: ${letterGrade} (${quality})\n⬇️ DL: ${finalDl} Mbps\n⬆️ UL: ${finalUl} Mbps\n⏱️ Ping: ${avgPing}ms | Jitter: ${jitter}ms\nTested on QuickUtils`;
+                shareBtn.onclick = () => {
+                    navigator.clipboard.writeText(shareText).then(() => {
+                        const og = shareBtn.textContent;
+                        shareBtn.textContent = '✅ Copied!';
+                        setTimeout(() => shareBtn.textContent = og, 2000);
+                    });
+                };
+            }
+            
+            // 2. Global Comparison
+            const compSpeed = $('#compYourSpeed');
+            const compBar = $('#compYourBar');
+            if(compSpeed && compBar) {
+                compSpeed.textContent = finalDl + ' Mbps';
+                // relative to 200 max for bar scaling visually
+                const pct = Math.min(100, Math.max(2, (fDl / 200) * 100));
+                compBar.style.width = pct + '%';
+            }
+            
+            // 3. Insights and Recommendations
+            const recEl = $('#networkRecommendations');
+            if(recEl) {
+                let recs = [];
+                if(fDl >= 100) recs.push('✅ Ideal for 4K/8K streaming and large downloads.');
+                else if(fDl >= 25) recs.push('✅ Good for HD streaming and casual browsing.');
+                else recs.push('⚠️ May struggle with multiple HD streams.');
+                
+                if(avgPing <= 40 && jitter <= 10) recs.push('✅ Perfect for competitive online gaming.');
+                else if(avgPing > 100) recs.push('⚠️ High latency; online gaming will have noticeable lag.');
+                
+                if(fUl >= 20) recs.push('✅ Great for heavy video conferencing and uploading files.');
+                else if(fUl < 5) recs.push('⚠️ Video calls may drop quality when you speak/present.');
+                
+                recEl.innerHTML = recs.join('<br>');
+            }
+            
+            // 4. History Logging
+            try {
+                const historyStr = localStorage.getItem('qu_speed_history') || '[]';
+                const history = JSON.parse(historyStr);
+                const record = {
+                    date: new Date().toISOString(),
+                    dl: finalDl,
+                    ul: finalUl,
+                    ping: avgPing,
+                    score: letterGrade,
+                    color: statusDisplay.style.color
+                };
+                history.unshift(record);
+                if(history.length > 20) history.pop();
+                localStorage.setItem('qu_speed_history', JSON.stringify(history));
+                renderHistory();
+            } catch(e) {}
+            
+        }); 
+
+        // Initial History Render
+        function renderHistory() {
+            const list = $('#historyLogList');
+            const empty = $('#historyEmpty');
+            if(!list) return;
+            try {
+                const history = JSON.parse(localStorage.getItem('qu_speed_history') || '[]');
+                if(history.length === 0) {
+                    if(empty) empty.style.display = 'block';
+                    return;
+                }
+                if(empty) empty.style.display = 'none';
+                
+                // Clear existing except empty message
+                Array.from(list.children).forEach(c => { if(c.id !== 'historyEmpty') c.remove(); });
+                
+                history.forEach(item => {
+                    const row = document.createElement('div');
+                    const d = new Date(item.date);
+                    const timeStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); padding: 6px 10px; border-radius: 6px; border-left: 3px solid ' + item.color + ';';
+                    row.innerHTML = `
+                        <div>
+                            <div style="font-weight:600; font-size:0.85rem;">⬇ ${item.dl} <span style="font-weight:400; font-size:0.75rem; color:#888;">Mbps</span></div>
+                            <div style="font-weight:600; font-size:0.85rem;">⬆ ${item.ul} <span style="font-weight:400; font-size:0.75rem; color:#888;">Mbps</span></div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:0.7rem; color:#aaa;">${timeStr}</div>
+                            <div style="font-weight:800; color:${item.color}; font-size:0.9rem;">${item.score}</div>
+                        </div>
+                    `;
+                    list.appendChild(row);
+                });
+            } catch(e) {}
+        }
+        renderHistory();
+        
+        const clearBtn = $('#clearHistoryBtn');
+        if(clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                localStorage.removeItem('qu_speed_history');
+                const list = $('#historyLogList');
+                if(list) Array.from(list.children).forEach(c => { if(c.id !== 'historyEmpty') c.remove(); });
+                const empty = $('#historyEmpty');
+                if(empty) empty.style.display = 'block';
+            });
+        }
+        
     }
 
     // Jitter Chart and Device Diagnostics Simulation
