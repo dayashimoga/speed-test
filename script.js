@@ -290,15 +290,17 @@
 
             const ulThread = async () => {
                 while (!done) {
-                    const buf = new Uint8Array(CHUNK);
-                    crypto.getRandomValues(buf); // non-zero payload (compressible payload gives false results)
+                    const strPayload = '0'.repeat(CHUNK);
                     try {
-                        await fetch('https://speed.cloudflare.com/__up', {
-                            method: 'POST', body: buf, cache: 'no-store',
+                        const r = await fetch('https://speed.cloudflare.com/__up', {
+                            method: 'POST', body: strPayload, cache: 'no-store',
                             headers: { 'Content-Type': 'text/plain' }
                         });
-                        totalBytes += CHUNK;
-                    } catch {}
+                        if (r.ok) totalBytes += CHUNK;
+                        else await sleep(100);
+                    } catch {
+                        await sleep(100);
+                    }
                 }
             };
 
