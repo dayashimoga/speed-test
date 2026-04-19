@@ -24,6 +24,7 @@
     <meta name="description" content="Multi-threaded enterprise grade speed test with real-time waveform analytics.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📶</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <link rel="stylesheet" href="quickutils-core.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -56,6 +57,10 @@
                     <div id="speedDisplay" class="speed-value">0.0</div>
                     <div id="speedUnit" class="speed-unit">Mbps</div>
                     <div id="phaseDisplay" class="phase-label">READY</div>
+                    <div class="options-row mt-2" style="font-size:0.75rem; opacity:0.8; display:flex; justify-content:center; gap:10px;">
+                        <label><input type="checkbox" id="ipv6Toggle" checked> IPv6</label>
+                        <label><input type="checkbox" id="http3Toggle" checked> HTTP/3 QUIC</label>
+                    </div>
                 </div>
             </div>
             <button class="btn btn-primary btn-glow" id="startTest">▶ INITIALIZE DIAGNOSTIC</button>
@@ -65,6 +70,7 @@
             </div>
         </div>
 
+        <div id="pdfExportArea">
         <div class="metrics-grid">
             <div class="metric-card border-blue">
                 <div class="metric-label">⬇ DOWNLOAD</div>
@@ -82,6 +88,14 @@
                 <div class="metric-label">〰 JITTER</div>
                 <div class="metric-value"><span id="jitter">—</span> <small>ms</small></div>
             </div>
+            <div class="metric-card border-red">
+                <div class="metric-label">💥 PACKET LOSS</div>
+                <div class="metric-value"><span id="packetLoss">—</span></div>
+            </div>
+            <div class="metric-card border-green">
+                <div class="metric-label">🛑 BUFFERBLOAT</div>
+                <div class="metric-value">+<span id="bufferbloat">—</span> <small>ms</small></div>
+            </div>
         </div>
 
         <div class="panels-grid">
@@ -93,6 +107,7 @@
                     Test your network to reveal streaming and gaming capabilities.
                 </div>
                 <button class="btn btn-secondary mt-3 w-100" id="shareBtn" disabled>📋 Copy Certification</button>
+                <button class="btn btn-primary mt-2 w-100" id="pdfBtn" style="display:none; background: linear-gradient(135deg, #10b981, #059669);">📄 Download PDF Report</button>
             </div>
 
             <div class="glass-card panel">
@@ -102,7 +117,8 @@
                 <div class="data-list">
                     <div class="data-row"><span>Target Node:</span><span id="serverNode" class="text-highlight">Routing...</span></div>
                     <div class="data-row"><span>Test Status:</span><span id="connStatus" class="status-badge">Standby</span></div>
-                    <div class="data-row"><span>Test Mode:</span><span>Multi-Threaded</span></div>
+                    <div class="data-row"><span>Test Mode:</span><span>Multi-Threaded (x8)</span></div>
+                    <div class="data-row"><span>ISP / AS Name:</span><span id="ispName" class="text-highlight">Detecting...</span></div>
                 </div>
             </div>
 
@@ -111,14 +127,39 @@
                     <span>Historical Analytics</span>
                     <button id="clearHistoryBtn" class="btn-clear" aria-label="Clear history">Clear</button>
                 </div>
+                <div style="height: 120px; margin-bottom: 1rem;"><canvas id="historyChart"></canvas></div>
                 <div id="historyLogList" class="history-list"></div>
+            </div>
+        </div>
+        </div> <!-- end pdf export area -->
+
+        <div class="panels-grid" style="margin-top: 1.5rem;">
+            <div class="glass-card panel" style="grid-column: span 2;">
+                <div class="panel-header">
+                    <span>Edge Network Routing</span>
+                </div>
+                <div id="serverMap" style="height: 250px; border-radius: 8px; background:#1e1e1e;"></div>
+            </div>
+            <div class="glass-card panel">
+                <div class="panel-header">
+                    <span>Advanced Diagnostics</span>
+                    <button id="runDiagBtn" class="btn-clear" style="color:#3b82f6;">Run Trace</button>
+                </div>
+                <div id="diagConsole" class="diag-console">
+                    > Ready...
+                </div>
             </div>
         </div>
     </main>
 
     <footer class="footer"><div class="container text-center py-4 text-muted">© 2026 QuickUtils. Multi-threaded Architecture. <!-- CI Trigger --> </div></footer>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="quickutils-core.js"></script>
     <script src="script.js"></script>
+
+
 
 <!-- QuickUtils Network Promo -->
 <div id="qu-promo-ribbon" style="position:relative; z-index:50; margin-top:2rem; padding:0; background:#111; border-top:1px solid rgba(128,128,128,0.3); text-align:center; font-family:sans-serif;">
@@ -224,6 +265,8 @@
    </div>
 </div>
 <!-- /QuickUtils Network Promo -->
+
+
 
 </body>
 </html>
