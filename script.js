@@ -13,6 +13,12 @@
    ═══════════════════════════════════════════════════ */
 'use strict';
 
+import {
+    mean, stddev, median, calcMOS, calcQualityScore,
+    gradeFromScore, bufferbloatGrade, generateTestId,
+    generateInsights, formatResultsCSV, calcStabilityScore
+} from './speed-test-utils.js';
+
 (function () {
     // ── Bootstrap QuickUtils Core ──
     if (typeof QU !== 'undefined') QU.init({ kofi: true });
@@ -51,6 +57,7 @@
         dlMin:       $('#dlMin'),
         ulMax:       $('#ulMax'),
         pdfBtn:      $('#pdfBtn'),
+        csvBtn:      $('#csvBtn'),
         runDiag:     $('#runDiagBtn'),
         console:     $('#diagConsole'),
     };
@@ -358,89 +365,13 @@
         return Math.round((lost / TOTAL) * 100);
     }
 
-    // ── MOS Score Calculation (ITU-T E-Model simplified) ──
-    function calcMOS(latency, jitter, loss) {
-        const R = 93.2 - latency * 0.1 - jitter * 0.4 - loss * 2.5;
-        const clampedR = Math.max(0, Math.min(R, 100));
-        if (clampedR <= 0) return 1.0;
-        const mos = 1 + 0.035 * clampedR + 0.000007 * clampedR * (clampedR - 60) * (100 - clampedR);
-        return Math.max(1, Math.min(mos, 4.5)).toFixed(2);
-    }
-
-    // ── AIM-style Network Quality Score ──
-    function calcQualityScore(dl, ul, lat, jit, loss) {
-        let score = 100;
-        // Latency penalties
-        if (lat > 100) score -= 25;
-        else if (lat > 50) score -= 12;
-        else if (lat > 30) score -= 4;
-        // Jitter penalties
-        if (jit > 30) score -= 15;
-        else if (jit > 15) score -= 8;
-        else if (jit > 8) score -= 3;
-        // Packet loss
-        score -= loss * 5;
-        // Download bonuses
-        if (dl < 5)   score -= 30;
-        else if (dl < 25)  score -= 15;
-        else if (dl < 100) score -= 5;
-        // Upload
-        if (ul < 2)   score -= 10;
-        else if (ul < 10)  score -= 4;
-        return Math.max(0, Math.min(100, Math.round(score)));
-    }
-
-    function gradeFromScore(score) {
-        if (score >= 90) return { letter: 'A+', label: 'Excellent', color: '#4ade80' };
-        if (score >= 75) return { letter: 'A',  label: 'Very Good', color: '#86efac' };
-        if (score >= 60) return { letter: 'B',  label: 'Good',      color: '#38bdf8' };
-        if (score >= 45) return { letter: 'C',  label: 'Fair',      color: '#fbbf24' };
-        if (score >= 25) return { letter: 'D',  label: 'Poor',      color: '#f97316' };
-        return { letter: 'F', label: 'Very Poor', color: '#ef4444' };
-    }
-
-    function bufferbloatGrade(unloaded, loaded) {
-        const diff = loaded - unloaded;
-        if (diff < 5)   return { grade: 'A', label: 'No Bufferbloat',      color: '#4ade80' };
-        if (diff < 30)  return { grade: 'B', label: 'Low Bufferbloat',     color: '#86efac' };
-        if (diff < 60)  return { grade: 'C', label: 'Moderate Bufferbloat',color: '#fbbf24' };
-        if (diff < 200) return { grade: 'D', label: 'High Bufferbloat',    color: '#f97316' };
-        return { grade: 'F', label: 'Severe Bufferbloat',   color: '#ef4444' };
-    }
-
-    // ── Generate AI Insights ──
-    function generateInsights(dl, ul, lat, jit, loss, mos, bloatGrade) {
-        const tips = [];
-        if (dl >= 500) tips.push('✅ <strong>Ultra-fast downloads.</strong> Supports 8K streaming, cloud backup, and enterprise workloads across dozens of devices simultaneously.');
-        else if (dl >= 100) tips.push('✅ <strong>Excellent download speed.</strong> Perfect for 4K streaming on multiple devices, video conferencing, and large file transfers.');
-        else if (dl >= 25)  tips.push('✅ <strong>Solid HD streaming.</strong> Comfortably handles 1080p video and family internet use.');
-        else tips.push('⚠️ <strong>Slow downloads.</strong> Consider upgrading your plan or checking for line interference.');
-
-        if (ul >= 100) tips.push('✅ <strong>Pro-grade upload.</strong> Ideal for live streaming, cloud collaboration, and video production.');
-        else if (ul >= 20) tips.push('✅ <strong>Good upload speed.</strong> Supports Zoom, remote work, and occasional cloud backups.');
-        else tips.push('⚠️ <strong>Upload bottleneck.</strong> May cause issues with video calls and live streaming.');
-
-        if (lat < 20 && jit < 5) tips.push('🎮 <strong>Gaming-ready.</strong> Sub-20ms ping with ultra-low jitter — ideal for competitive FPS titles like Valorant, CS2, and Apex Legends.');
-        else if (lat < 50)       tips.push('✅ <strong>Low latency.</strong> Suitable for online gaming and real-time collaboration.');
-        else if (lat > 100)      tips.push('⚠️ <strong>High latency detected.</strong> This will cause noticeable lag in VoIP calls and online gaming. Consider using a wired connection.');
-
-        if (loss > 5)  tips.push('❌ <strong>Significant packet loss!</strong> You may experience choppy video calls and connection drops. Check your router/cables.');
-        else if (loss > 1) tips.push('⚠️ <strong>Minor packet loss.</strong> Occasional dropped packets detected. Usually harmless for browsing but may affect VoIP quality.');
-        else tips.push('✅ <strong>Zero packet loss.</strong> Your connection is rock-solid.');
-
-        if (bloatGrade.grade === 'A')          tips.push('✅ <strong>No Bufferbloat.</strong> Your router manages latency under load excellently.');
-        else if (bloatGrade.grade === 'F')     tips.push('❌ <strong>Severe Bufferbloat!</strong> Under load, your latency spikes dramatically. This ruins gaming and video calls. Enable SQM/QoS on your router.');
-        else if (bloatGrade.grade === 'D')     tips.push('⚠️ <strong>High Bufferbloat.</strong> Consider enabling Smart Queue Management (SQM) in your router settings.');
-
-        const mosNum = parseFloat(mos);
-        if (mosNum >= 4.0) tips.push(`📞 <strong>VoIP Quality: Excellent (MOS ${mos}).</strong> Crystal-clear voice and video calls.`);
-        else if (mosNum >= 3.5) tips.push(`📞 <strong>VoIP Quality: Good (MOS ${mos}).</strong> Acceptable for most calls.`);
-        else tips.push(`📞 <strong>VoIP Quality: Poor (MOS ${mos}).</strong> Audio calls may be choppy. Check for packet loss and high jitter.`);
-
-        return '<ul style="list-style:none;padding:0;margin:0;">' + tips.map(t => `<li style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);">${t}</li>`).join('') + '</ul>';
-    }
-
-    // ── History ──
+        // Insights
+        if (els.insights && bloatInfo) {
+            const insightsArr = generateInsights(finalDl, finalUl, finalLat, finalJit, finalLoss, finalMos, bloatInfo);
+            els.insights.innerHTML = '<ul style="list-style:none;padding:0;margin:0;">' + 
+                insightsArr.map(t => `<li style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);">${t}</li>`).join('') + 
+                '</ul>';
+        }
     function loadHistory() {
         try {
             const hist = JSON.parse(localStorage.getItem('qu_speed_hist_v2') || '[]');
@@ -596,6 +527,7 @@
         setGauge(finalDl, Math.max(finalDl * 1.5, 100));
 
         if (els.pdfBtn) els.pdfBtn.style.display = 'block';
+        if (els.csvBtn) els.csvBtn.style.display = 'block';
 
         if (!success) {
             if (els.status) { els.status.textContent = 'Stopped'; els.status.className = 'status-badge status-warn'; }
@@ -618,7 +550,12 @@
 
         // Insights
         if (els.insights && bloatInfo) {
-            els.insights.innerHTML = generateInsights(finalDl, finalUl, finalLat, finalJit, finalLoss, finalMos, bloatInfo);
+            const insightsArr = generateInsights(finalDl, finalUl, finalLat, finalJit, finalLoss, finalMos, bloatInfo);
+            els.insights.innerHTML = '<ul style="list-style:none;padding:0;margin:0;">' + 
+                insightsArr.map(t => {
+                    const icon = t.includes('Severe') || t.includes('Significant') ? '❌ ' : t.includes('bottleneck') || t.includes('High') || t.includes('Slow') || t.includes('Minor') ? '⚠️ ' : '✅ ';
+                    return `<li style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);">${icon}${t}</li>`;
+                }).join('') + '</ul>';
         }
 
         // Save to history
@@ -675,17 +612,6 @@
         });
     }
 
-    // ── Math helpers ──
-    function mean(arr) { return arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0; }
-    function stddev(arr) {
-        const m = mean(arr);
-        return Math.sqrt(arr.reduce((s, v) => s + (v - m) ** 2, 0) / arr.length);
-    }
-    function median(arr) {
-        if (!arr.length) return 0;
-        const s = [...arr].sort((a, b) => a - b);
-        return s.length % 2 ? s[Math.floor(s.length / 2)] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2;
-    }
     function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
     // ── Server Map Initialization ──
@@ -762,6 +688,24 @@
             html2pdf().set(opt).from(element).save().then(()=> {
                 els.pdfBtn.textContent = originalText;
             });
+        };
+    }
+
+    // ── CSV Export ──
+    if (els.csvBtn) {
+        els.csvBtn.onclick = () => {
+            const hist = JSON.parse(localStorage.getItem('qu_speed_hist_v2') || '[]');
+            if (!hist.length) return alert('No tests available to export.');
+            const csvData = formatResultsCSV(hist);
+            const blob = new Blob([csvData], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `QuickUtils_Speed_History_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
         };
     }
 

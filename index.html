@@ -135,7 +135,10 @@
                     Test your network to reveal streaming and gaming capabilities.
                 </div>
                 <button class="btn btn-secondary mt-3 w-100" id="shareBtn" disabled>📋 Copy Certification</button>
-                <button class="btn btn-primary mt-2 w-100" id="pdfBtn" style="display:none; background: linear-gradient(135deg, #10b981, #059669);">📄 Download PDF Report</button>
+                <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+                    <button class="btn btn-primary w-100" id="pdfBtn" style="display:none; background: linear-gradient(135deg, #10b981, #059669);">📄 PDF Report</button>
+                    <button class="btn btn-primary w-100" id="csvBtn" style="display:none; background: linear-gradient(135deg, #0ea5e9, #2563eb);">📊 CSV Export</button>
+                </div>
             </div>
 
             <div class="glass-card panel">
@@ -185,7 +188,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="quickutils-core.js"></script>
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 
 
 
